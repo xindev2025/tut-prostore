@@ -1,0 +1,37 @@
+import { z } from 'zod'
+import { formatNumberWithDecimal } from './utils'
+
+const currency = z
+  .string()
+  .refine(
+    (value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(Number(value))),
+    'Price must have exactly two decimal places'
+  )
+
+export const InsertProductSchema = z.object({
+  name: z
+    .string()
+    .min(3, 'Name must be at least 3 characters')
+    .max(32, 'Name must not be greater than 32 characters'),
+  slug: z
+    .string()
+    .min(3, 'Slug must be at least 3 characters')
+    .max(32, 'Slug must not be greater than 32 characters'),
+  category: z
+    .string()
+    .min(3, 'Category must be at least 3 characters')
+    .max(32, 'Category must not be greater than 32 characters'),
+  brand: z
+    .string()
+    .min(3, 'Brand must be at least 3 characters')
+    .max(32, 'Brand must not be greater than 32 characters'),
+  description: z
+    .string()
+    .min(3, 'Description must be at least 3 characters')
+    .max(132, 'Description must not be greater than 132 characters'),
+  stock: z.coerce.number(),
+  images: z.array(z.string()).min(1, 'Product must have at least one image'),
+  isFeatured: z.boolean(),
+  banner: z.string().nullable(),
+  price: currency
+})
