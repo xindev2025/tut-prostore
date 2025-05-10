@@ -21,13 +21,13 @@ export const prisma = new PrismaClient({ adapter }).$extends({
   result: {
     product: {
       price: {
-        compute(product: { price: Decimal | null }) {
-          return product.price?.toString()
+        compute(product: { price: Decimal }) {
+          return product.price.toString()
         }
       },
       rating: {
-        compute(product: { rating: Decimal | null }) {
-          return product.rating?.toString()
+        compute(product: { rating: Decimal }) {
+          return product.rating.toString()
         }
       }
     }
