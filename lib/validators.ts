@@ -38,5 +38,5 @@ export const InsertProductSchema = z.object({
 
 export const SignInFormSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be atleast 8 characters')
+  password: z.string().min(6, 'Password must be atleast 6 characters')
 })

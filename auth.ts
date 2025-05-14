@@ -29,14 +29,12 @@ export const config = {
             email: credentials.email as string
           }
         })
-
         // check if user exist and password match
         if (user?.id && user?.password) {
           const isMatch = compareSync(
             credentials.password as string,
             user.password
           )
-
           // check if password is correct, return user
           if (isMatch) {
             return {
