@@ -44,6 +44,7 @@ export async function addItemToCart(data: CartItem) {
 
     if (!product) throw new Error('Product not found')
 
+    // check if cart exist
     if (!cart) {
       const newCart = InsertCartSchema.parse({
         userId: userId,
@@ -52,6 +53,7 @@ export async function addItemToCart(data: CartItem) {
         ...calcPrice([item])
       })
 
+      // create new cart
       await prisma.cart.create({
         data: newCart
       })
@@ -126,4 +128,62 @@ export async function getMyCart() {
     shippingPrice: cart.shippingPrice.toString(),
     taxPrice: cart.taxPrice.toString()
   })
+}
+
+export async function removeItemFromCart(productId: string) {
+  try {
+    // check for cart cokkie
+    const sessionCartId = (await cookies()).get('sessionCartId')?.value
+    if (!sessionCartId) throw new Error('Cart session not found')
+
+    // get product
+    const product = await prisma.product.findFirst({
+      where: { id: productId }
+    })
+
+    if (!product) throw new Error('No product found')
+
+    // get user cart
+    const cart = await getMyCart()
+    if (!cart) throw new Error('Cart not found')
+
+    // check for item
+    const productExist = cart.items.find(
+      (product) => product.productId === productId
+    )
+    if (!productExist) throw new Error('Product not found')
+    // check if product only have 1 qty
+    if (productExist.qty === 1) {
+      // remove from cart
+      cart.items = cart.items.filter(
+        (product) => product.productId !== productId
+      )
+    } else {
+      // decrease qty
+      cart.items.find((product) => product.productId === productId)!.qty =
+        productExist.qty - 1
+    }
+
+    // update cart
+    await prisma.cart.update({
+      where: { id: cart.id },
+      data: {
+        items: cart.items as Prisma.CartUpdateitemsInput[],
+        ...calcPrice(cart.items)
+      }
+    })
+
+    // refresh page
+    revalidatePath(`/product/${product.slug}`)
+
+    return {
+      success: true,
+      message: `${product.name} was remove from cart`
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error)
+    }
+  }
 }
