@@ -4,3 +4,11 @@ export const APP_DESC =
 export const SERVER_URL =
   process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000'
 export const DATABASE_URL = process.env.DATABASE_URL ?? ''
+
+export const shippingAddressDefaultValues = {
+  fullName: '',
+  streetAddress: '',
+  city: '',
+  postalCode: '',
+  country: ''
+}
