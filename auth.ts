@@ -4,6 +4,7 @@ import { prisma } from './db/prisma'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { compareSync } from 'bcrypt-ts-edge'
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 export const config = {
   pages: {
@@ -65,8 +66,9 @@ export const config = {
 
       return session
     },
-    async jwt({ token, user }: any) {
+    async jwt({ token, user, trigger, session }: any) {
       if (user) {
+        token.id = user.id
         token.role = user.role
         // for google Oauth
         if (user.name === 'NO_NAME') {
@@ -77,6 +79,35 @@ export const config = {
             data: { name: token.name }
           })
         }
+
+        console.log(user)
+        console.log(trigger)
+        if (trigger === 'signIn' || trigger === 'signUp') {
+          const cookiesObject = await cookies()
+          const sessionCartId = cookiesObject.get('sessionCartId')?.value
+
+          if (sessionCartId) {
+            const sessionCart = await prisma.cart.findFirst({
+              where: { sessionCartId }
+            })
+
+            if (sessionCart) {
+              // delete current user cart
+              await prisma.cart.deleteMany({
+                where: { userId: user.id }
+              })
+              // assign new cart
+              await prisma.cart.update({
+                where: { id: sessionCart.id },
+                data: { userId: user.id }
+              })
+            }
+          }
+        }
+      }
+
+      if (session?.user.name && trigger === 'update') {
+        token.name = session.user.name
       }
       return token
     },
