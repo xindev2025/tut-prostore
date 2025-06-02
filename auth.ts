@@ -80,8 +80,6 @@ export const config = {
           })
         }
 
-        console.log(user)
-        console.log(trigger)
         if (trigger === 'signIn' || trigger === 'signUp') {
           const cookiesObject = await cookies()
           const sessionCartId = cookiesObject.get('sessionCartId')?.value
@@ -112,6 +110,23 @@ export const config = {
       return token
     },
     authorized({ request, auth }: any) {
+      // protected paths
+      const protectedPaths = [
+        /\/shipping-address/,
+        /\/payment-method/,
+        /\/place-order/,
+        /\/profile/,
+        /\/user\/(.*)/,
+        /\/order\/(.*)/,
+        /\/admin/
+      ]
+
+      // get pathname
+      const { pathname } = request.nextUrl
+      // check if not authorized and accessing the protected path
+      if (!auth && protectedPaths.some((path) => path.test(pathname)))
+        return false
+
       // check for session cart cookie
       if (!request.cookies.get('sessionCartId')) {
         // generate new session card id cookie
