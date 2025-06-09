@@ -12,3 +12,6 @@ export const shippingAddressDefaultValues = {
   postalCode: '',
   country: ''
 }
+
+export const PAYMENT_METHOD = ['paypal', 'stripe', 'cashOnDelivery']
+export const DEFAULT_PAYMENT_METHOD = 'paypal'
