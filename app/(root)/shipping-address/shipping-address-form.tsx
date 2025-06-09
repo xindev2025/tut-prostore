@@ -41,6 +41,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
         toast('Failed Update', {
           description: res.message
         })
+        return
       }
 
       router.push('/payment-method')
