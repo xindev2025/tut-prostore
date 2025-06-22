@@ -6,6 +6,7 @@ import { getMyCart } from './cart.action'
 import { getUserById } from './user.actions'
 import { InsertOrderSchema } from '../validators'
 import { prisma } from '@/db/prisma'
+import { paypal } from '../paypal'
 
 export async function createOrder() {
   try {
@@ -115,4 +116,46 @@ export async function getOrderById(orderId: string) {
   })
 
   return convertToPlainObject(order)
+}
+
+// create new paypal order
+export async function createPaypalOrder(orderId: string) {
+  try {
+    // get order from data
+    const order = await prisma.order.findFirst({
+      where: { id: orderId }
+    })
+
+    if (!order) {
+      throw new Error('Order not found')
+    }
+
+    // create paypal order
+    const paypalOrder = await paypal.createOrder(Number(order.totalPrice))
+
+    // update order with paypal order id
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        paymentResult: {
+          id: paypalOrder.id,
+          emailAddress: '',
+          status: '',
+          pricePaid: 0
+        }
+      }
+    })
+
+    return {
+      success: true,
+      message: 'Item order created successfully',
+      data: paypalOrder.id
+    }
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error
+    }
+
+    return { success: false, message: formatError(error) }
+  }
 }
