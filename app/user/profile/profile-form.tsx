@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { updateUserProfile } from '@/lib/actions/user.actions'
 const ProfileForm = () => {
   const { data: session, update } = useSession()
 
@@ -25,15 +26,35 @@ const ProfileForm = () => {
     }
   })
 
-  const onSubmit = () => {
-    return
+  const onSubmit = async (values: z.infer<typeof updateUserSchema>) => {
+    const res = await updateUserProfile(values)
+
+    if (!res.success) {
+      return toast('Failed Update', {
+        description: res.message
+      })
+    }
+
+    const newSession = {
+      ...session,
+      user: {
+        ...session?.user,
+        name: values.name
+      }
+    }
+    // update session
+    await update(newSession)
+
+    toast('User Profile', {
+      description: res.message
+    })
   }
 
   return (
     <Form {...form}>
       <form
         className='flex flex-col gap-5'
-        onClick={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onSubmit)}
       >
         <div className='flex flex-col gap-5'>
           <FormField
