@@ -290,14 +290,14 @@ export async function getUserOrders({
   }
 
   const data = await prisma.order.findMany({
-    where: { id: session.user?.id },
+    where: { userId: session.user?.id },
     orderBy: { createdAt: 'desc' },
     take: limit,
     skip: (page - 1) * limit
   })
 
   const dataCount = await prisma.order.count({
-    where: { id: session.user?.id }
+    where: { userId: session.user?.id }
   })
 
   return {
