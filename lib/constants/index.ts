@@ -15,3 +15,5 @@ export const shippingAddressDefaultValues = {
 
 export const PAYMENT_METHOD = ['paypal', 'stripe', 'cashOnDelivery']
 export const DEFAULT_PAYMENT_METHOD = 'paypal'
+
+export const PAGE_SIZE = 5
