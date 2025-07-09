@@ -1,4 +1,5 @@
 import Pagination from '@/components/shared/pagination'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -7,19 +8,25 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { getUserOrders } from '@/lib/actions/order.action'
+import { getAllOrders } from '@/lib/actions/order.action'
+import { requireAdmin } from '@/lib/auth-guard'
 import { formatCurrency, formatDateTime, formatId } from '@/lib/utils'
+import { Metadata } from 'next'
 import Link from 'next/link'
 
-const OrderPage = async (props: {
-  searchParams: Promise<{
-    page: string
-  }>
+export const metadata: Metadata = {
+  title: 'Customer Orders'
+}
+const OrdersPage = async (props: {
+  searchParams: Promise<{ page: string }>
 }) => {
-  const { page } = await props.searchParams
+  await requireAdmin()
 
-  const orders = await getUserOrders({
-    page: Number(page) || 1
+  const { page = '1' } = await props.searchParams
+
+  const orders = await getAllOrders({
+    page: Number(page),
+    limit: 5
   })
 
   return (
@@ -56,9 +63,9 @@ const OrderPage = async (props: {
                     : 'Not Delivered'}
                 </TableCell>
                 <TableCell>
-                  <Link href={`/order/${order.id}`}>
-                    <span className='px-2'>Details</span>
-                  </Link>
+                  <Button asChild variant={'outline'} size={'sm'}>
+                    <Link href={`/order/${order.id}`}>Details</Link>
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -68,7 +75,7 @@ const OrderPage = async (props: {
           <Pagination
             page={Number(page) || 1}
             totalPages={orders.totalPages}
-            urlParamName='user'
+            urlParamName='admin'
           />
         )}
       </div>
@@ -76,4 +83,4 @@ const OrderPage = async (props: {
   )
 }
 
-export default OrderPage
+export default OrdersPage

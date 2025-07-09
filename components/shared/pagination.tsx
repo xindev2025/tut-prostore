@@ -6,7 +6,7 @@ import { Button } from '../ui/button'
 type PaginationProps = {
   page: number | string
   totalPages: number
-  urlParamName?: string
+  urlParamName: string
 }
 
 const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
@@ -14,7 +14,7 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
 
   const handleClick = (btnType: string) => {
     const pageValue = btnType === 'next' ? Number(page) + 1 : Number(page) - 1
-    router.push(`/user/orders?page=${pageValue}`)
+    router.push(`/${urlParamName}/orders?page=${pageValue}`)
   }
 
   return (
