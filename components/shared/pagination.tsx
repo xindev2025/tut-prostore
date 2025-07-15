@@ -14,7 +14,7 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
 
   const handleClick = (btnType: string) => {
     const pageValue = btnType === 'next' ? Number(page) + 1 : Number(page) - 1
-    router.push(`/${urlParamName}/orders?page=${pageValue}`)
+    router.push(`/${urlParamName}?page=${pageValue}`)
   }
 
   return (

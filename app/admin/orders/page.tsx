@@ -79,7 +79,7 @@ const OrdersPage = async (props: {
           <Pagination
             page={Number(page) || 1}
             totalPages={orders.totalPages}
-            urlParamName='admin'
+            urlParamName='admin/orders'
           />
         )}
       </div>
