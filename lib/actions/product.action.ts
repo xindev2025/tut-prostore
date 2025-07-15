@@ -1,7 +1,8 @@
 'use server'
 import { prisma } from '@/db/prisma'
-import { convertToPlainObject } from '../utils'
+import { convertToPlainObject, formatError } from '../utils'
 import { PAGE_SIZE } from '../constants'
+import { revalidatePath } from 'next/cache'
 
 export async function getListedProducts() {
   try {
@@ -38,8 +39,6 @@ export async function getAllProducts({
   page: number
   category?: string
 }) {
-  console.log(page)
-  console.log(limit)
   const data = await prisma.product.findMany({
     skip: (page - 1) * limit,
     take: limit
@@ -50,5 +49,31 @@ export async function getAllProducts({
   return {
     data,
     totalPage: Math.ceil(dataCount / limit)
+  }
+}
+
+// delete product
+export async function deleteProduct(id: string) {
+  try {
+    const product = await prisma.product.findFirst({
+      where: { id }
+    })
+
+    if (!product) {
+      throw new Error('Product not found')
+    }
+
+    await prisma.product.delete({
+      where: { id }
+    })
+
+    revalidatePath('/admin/products')
+
+    return {
+      success: true,
+      message: 'Successfully delete product'
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
   }
 }

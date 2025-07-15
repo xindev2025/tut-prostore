@@ -1,3 +1,4 @@
+import DeleteDialog from '@/components/shared/delete-dialog'
 import Pagination from '@/components/shared/pagination'
 import { Button } from '@/components/ui/button'
 import {
@@ -8,7 +9,8 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { getAllProducts } from '@/lib/actions/product.action'
+import { deleteProduct, getAllProducts } from '@/lib/actions/product.action'
+import { requireAdmin } from '@/lib/auth-guard'
 import { formatCurrency, formatId } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -19,6 +21,9 @@ const ProductsPage = async (props: {
     category: string
   }>
 }) => {
+  // admin authorization
+  await requireAdmin()
+
   const searchParams = await props.searchParams
 
   const page = Number(searchParams.page) || 1
@@ -66,12 +71,13 @@ const ProductsPage = async (props: {
                 <Button asChild variant={'outline'} size={'sm'}>
                   <Link href={`/admin/products/${product.id}`}>Edit</Link>
                 </Button>
+                <DeleteDialog id={product.id} action={deleteProduct} />
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      {products.totalPage && products.totalPage > 1 && (
+      {products.totalPage > 1 && (
         <Pagination
           page={page}
           totalPages={products.totalPage}
