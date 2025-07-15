@@ -3,6 +3,8 @@ import { prisma } from '@/db/prisma'
 import { convertToPlainObject, formatError } from '../utils'
 import { PAGE_SIZE } from '../constants'
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
+import { InsertProductSchema, UpdateProductSchema } from '../validators'
 
 export async function getListedProducts() {
   try {
@@ -72,6 +74,52 @@ export async function deleteProduct(id: string) {
     return {
       success: true,
       message: 'Successfully delete product'
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}
+
+// create product
+export async function createProduct(data: z.infer<typeof InsertProductSchema>) {
+  try {
+    const product = InsertProductSchema.parse(data)
+    await prisma.product.create({ data: product })
+
+    revalidatePath('/admin/products')
+
+    return {
+      success: true,
+      message: 'Successfully create product'
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}
+
+// update product
+export async function updateProduct(data: z.infer<typeof UpdateProductSchema>) {
+  try {
+    const product = UpdateProductSchema.parse(data)
+
+    const productExist = await prisma.product.findFirst({
+      where: { id: product.id }
+    })
+
+    if (!productExist) {
+      throw new Error('Product not found')
+    }
+
+    await prisma.product.update({
+      where: { id: product.id },
+      data: product
+    })
+
+    revalidatePath('/admin/products')
+
+    return {
+      success: true,
+      message: 'Successfully update product'
     }
   } catch (error) {
     return { success: false, message: formatError(error) }

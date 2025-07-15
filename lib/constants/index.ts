@@ -17,3 +17,18 @@ export const PAYMENT_METHOD = ['paypal', 'stripe', 'cashOnDelivery']
 export const DEFAULT_PAYMENT_METHOD = 'paypal'
 
 export const PAGE_SIZE = 2
+
+export const productDefaultValues = {
+  name: '',
+  slug: '',
+  category: '',
+  images: [],
+  brand: '',
+  description: '',
+  price: '0',
+  stock: '0',
+  rating: '0',
+  numReviews: '0',
+  isFeatured: false,
+  banner: null
+}
