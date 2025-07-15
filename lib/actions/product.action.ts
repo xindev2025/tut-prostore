@@ -1,6 +1,7 @@
 'use server'
 import { prisma } from '@/db/prisma'
 import { convertToPlainObject } from '../utils'
+import { PAGE_SIZE } from '../constants'
 
 export async function getListedProducts() {
   try {
@@ -23,4 +24,31 @@ export async function getProductBySlug({ slug }: { slug: string }) {
   })
 
   return convertToPlainObject(product)
+}
+
+// get all products
+export async function getAllProducts({
+  query,
+  limit = PAGE_SIZE,
+  page,
+  category
+}: {
+  query: string
+  limit?: number
+  page: number
+  category?: string
+}) {
+  console.log(page)
+  console.log(limit)
+  const data = await prisma.product.findMany({
+    skip: (page - 1) * limit,
+    take: limit
+  })
+
+  const dataCount = await prisma.product.count()
+
+  return {
+    data,
+    totalPage: Math.ceil(dataCount / limit)
+  }
 }
