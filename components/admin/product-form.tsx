@@ -1,6 +1,6 @@
 'use client'
 import { Product } from '@/types'
-import { ControllerRenderProps, useForm } from 'react-hook-form'
+import { ControllerRenderProps, SubmitHandler, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { InsertProductSchema, UpdateProductSchema } from '@/lib/validators'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,6 +16,9 @@ import {
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Textarea } from '../ui/textarea'
+import { createProduct, updateProduct } from '@/lib/actions/product.action'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 const ProductForm = ({
   type,
   product,
@@ -25,6 +28,7 @@ const ProductForm = ({
   product?: Product
   productId?: string
 }) => {
+  const router = useRouter()
   const form = useForm<
     z.infer<typeof InsertProductSchema> | z.infer<typeof UpdateProductSchema>
   >({
@@ -34,9 +38,46 @@ const ProductForm = ({
     defaultValues: product && type === 'update' ? product : productDefaultValues
   })
 
+  const onSubmit: SubmitHandler<
+    z.infer<typeof InsertProductSchema> | z.infer<typeof UpdateProductSchema>
+  > = async (values) => {
+    console.log('test')
+    if (type === 'create') {
+      const res = await createProduct(values)
+
+      if (!res.success) {
+        toast('Failed to create product', {
+          description: res.message
+        })
+      } else {
+        toast('Product created', {
+          description: res.message
+        })
+        router.push('/admin/products')
+      }
+    }
+    if (type === 'update') {
+      if (!productId) {
+        router.push('/admin/products')
+      }
+      const res = await updateProduct({ ...values, id: productId! })
+
+      if (!res.success) {
+        toast('Failed to update product', {
+          description: res.message
+        })
+      } else {
+        toast('Product updated', {
+          description: res.message
+        })
+        router.push('/admin/products')
+      }
+    }
+  }
+
   return (
     <Form {...form}>
-      <form className='space-y-8'>
+      <form className='space-y-8' onSubmit={form.handleSubmit(onSubmit)}>
         <div className='flex flex-col md:flex-row gap-5'>
           {/* name */}
           <FormField
@@ -179,7 +220,7 @@ const ProductForm = ({
               <FormItem className='w-full'>
                 <FormLabel>Stock</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter stock' {...field} />
+                  <Input placeholder='Enter stock' {...field} type='number' />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -220,7 +261,7 @@ const ProductForm = ({
         <div>
           {/* submit */}
           <Button
-            type='button'
+            type='submit'
             size={'lg'}
             disabled={form.formState.isSubmitting}
             className='button col-span-2 w-full'
