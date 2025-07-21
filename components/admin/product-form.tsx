@@ -259,7 +259,6 @@ const ProductForm = ({
                         <UploadButton
                           endpoint={'imageUploader'}
                           onClientUploadComplete={(res: { url: string }[]) => {
-                            console.log(res[0].url)
                             form.setValue('images', [...images, res[0].url])
                           }}
                           onUploadError={(error: Error) => {
