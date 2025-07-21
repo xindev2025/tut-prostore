@@ -30,8 +30,6 @@ const OrdersPage = async (props: {
     limit: 5
   })
 
-  // const deleteOrder = () => {}
-
   return (
     <div className='space-y-2'>
       <div className='h2-bold'>Orders</div>
