@@ -13,11 +13,11 @@ export const InsertProductSchema = z.object({
   name: z
     .string()
     .min(3, 'Name must be at least 3 characters')
-    .max(32, 'Name must not be greater than 32 characters'),
+    .max(64, 'Name must not be greater than 64 characters'),
   slug: z
     .string()
     .min(3, 'Slug must be at least 3 characters')
-    .max(32, 'Slug must not be greater than 32 characters'),
+    .max(64, 'Slug must not be greater than 64 characters'),
   category: z
     .string()
     .min(3, 'Category must be at least 3 characters')
@@ -32,8 +32,8 @@ export const InsertProductSchema = z.object({
     .max(132, 'Description must not be greater than 132 characters'),
   stock: z.coerce.number(),
   images: z.array(z.string()).min(1, 'Product must have at least one image'),
-  // isFeatured: z.boolean(),
-  // banner: z.string().nullable(),
+  isFeatured: z.boolean(),
+  banner: z.string().nullable(),
   price: currency
 })
 

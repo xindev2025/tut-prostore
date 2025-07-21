@@ -22,6 +22,7 @@ import { useRouter } from 'next/navigation'
 import { UploadButton } from '@/lib/uploadthing'
 import { Card, CardContent } from '../ui/card'
 import Image from 'next/image'
+import { Checkbox } from '../ui/checkbox'
 
 const ProductForm = ({
   type,
@@ -45,7 +46,6 @@ const ProductForm = ({
   const onSubmit: SubmitHandler<
     z.infer<typeof InsertProductSchema> | z.infer<typeof UpdateProductSchema>
   > = async (values) => {
-    console.log('test')
     if (type === 'create') {
       const res = await createProduct(values)
 
@@ -80,6 +80,8 @@ const ProductForm = ({
   }
 
   const images = form.watch('images')
+  const banner = form.watch('banner')
+  const isFeatured = form.watch('isFeatured')
 
   return (
     <Form {...form}>
@@ -252,7 +254,7 @@ const ProductForm = ({
                           className='w-20 h-20 object-cover object-center rounded-sm'
                           width={100}
                           height={100}
-                          loader={({ src }: { src: string }) => src}
+                          unoptimized
                         />
                       ))}
                       <FormControl>
@@ -274,7 +276,52 @@ const ProductForm = ({
             )}
           />
         </div>
-        <div>{/* isFeatured */}</div>
+        <div>
+          {/* isFeatured */}
+          Feature Product
+          <Card>
+            <CardContent className='space-y-2 mt-2'>
+              <FormField
+                control={form.control}
+                name='isFeatured'
+                render={({ field }) => (
+                  <FormItem className='flex space-x-2 items-center'>
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel>Is Featured?</FormLabel>
+                  </FormItem>
+                )}
+              />
+              {isFeatured && banner && (
+                <Image
+                  src={banner}
+                  alt='banner image'
+                  className='w-full object-cover object-center rounded-sm'
+                  width={1920}
+                  height={680}
+                  unoptimized
+                />
+              )}
+              {isFeatured && !banner && (
+                <FormControl>
+                  <UploadButton
+                    endpoint={'imageUploader'}
+                    onClientUploadComplete={(res: { url: string }[]) => {
+                      form.setValue('banner', res[0].url)
+                    }}
+                    onUploadError={(error: Error) => {
+                      toast.error(`Error! ${error.message}`)
+                    }}
+                  />
+                </FormControl>
+              )}
+            </CardContent>
+          </Card>
+        </div>
         <div>
           {/* description */}
           <FormField
