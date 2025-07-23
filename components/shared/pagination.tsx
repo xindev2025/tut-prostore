@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '../ui/button'
 
 type PaginationProps = {
@@ -11,10 +11,13 @@ type PaginationProps = {
 
 const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
   const router = useRouter()
-
+  const searchParams = useSearchParams()
   const handleClick = (btnType: string) => {
     const pageValue = btnType === 'next' ? Number(page) + 1 : Number(page) - 1
-    router.push(`/${urlParamName}?page=${pageValue}`)
+
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', pageValue.toString())
+    router.push(`/${urlParamName}?${params.toString()}`)
   }
 
   return (
