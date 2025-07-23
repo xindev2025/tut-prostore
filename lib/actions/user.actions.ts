@@ -16,6 +16,7 @@ import { PaymentMethod, ShippingAddress } from '@/types'
 import { PAGE_SIZE } from '../constants'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { Prisma } from '../generated/prisma'
 
 export async function signInUser(prevState: unknown, formData: FormData) {
   try {
@@ -204,18 +205,37 @@ export async function updateUserProfile(user: { name: string }) {
 // get all users
 export async function getAllUsers({
   limit = PAGE_SIZE,
-  page
+  page,
+  query
 }: {
   limit?: number
   page: number
+  query: string
 }) {
+  const queryFilter: Prisma.UserWhereInput =
+    query && query !== 'all'
+      ? {
+          name: {
+            contains: query,
+            mode: 'insensitive'
+          }
+        }
+      : {}
+
   const data = await prisma.user.findMany({
+    where: {
+      ...queryFilter
+    },
     orderBy: { createdAt: 'desc' },
     take: limit,
     skip: (page - 1) * limit
   })
 
-  const usersCount = await prisma.user.count()
+  const usersCount = await prisma.user.count({
+    where: {
+      ...queryFilter
+    }
+  })
 
   return {
     data,
