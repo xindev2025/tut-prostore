@@ -7,7 +7,7 @@ import { Input } from '../ui/input'
 const AdminSearch = () => {
   const pathname = usePathname()
 
-  const sections = ['order', 'users', 'products']
+  const sections = ['orders', 'users', 'products']
   const match = sections.find((section) =>
     pathname.includes(`/admin/${section}`)
   )
