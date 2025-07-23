@@ -13,6 +13,7 @@ import { prisma } from '@/db/prisma'
 import { formatError } from '../utils'
 import { PaymentMethod, ShippingAddress } from '@/types'
 import { PAGE_SIZE } from '../constants'
+import { revalidatePath } from 'next/cache'
 
 export async function signInUser(prevState: unknown, formData: FormData) {
   try {
@@ -217,5 +218,27 @@ export async function getAllUsers({
   return {
     data,
     totalPages: Math.ceil(usersCount / limit)
+  }
+}
+
+// delete user
+export async function deleteUser(id: string) {
+  try {
+    await prisma.user.delete({
+      where: { id }
+    })
+
+    revalidatePath('/admin/users')
+
+    return {
+      success: true,
+      message: 'User deleted successfully'
+    }
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error
+    }
+
+    return { success: false, message: formatError(error) }
   }
 }

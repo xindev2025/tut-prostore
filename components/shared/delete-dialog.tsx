@@ -28,7 +28,7 @@ const DeleteDialog = ({
       const res = await action(id)
 
       if (!res.success) {
-        toast('Failed Delete Order', {
+        toast('Failed Delete', {
           description: res.message
         })
       } else {
