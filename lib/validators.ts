@@ -135,3 +135,8 @@ export const updateUserSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
   email: z.string()
 })
+
+export const updateUserDetailSchema = updateUserSchema.extend({
+  id: z.string().min(1, 'ID is required'),
+  role: z.string().min(1, 'User role is required')
+})
