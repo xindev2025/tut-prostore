@@ -16,10 +16,13 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { updateUserDetails } from '@/lib/actions/user.actions'
 import { USER_ROLES } from '@/lib/constants'
 import { updateUserDetailSchema } from '@/lib/validators'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
 import { ControllerRenderProps, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 const UpdateUserForm = ({
@@ -27,13 +30,26 @@ const UpdateUserForm = ({
 }: {
   user: z.infer<typeof updateUserDetailSchema>
 }) => {
+  const router = useRouter()
   const form = useForm<z.infer<typeof updateUserDetailSchema>>({
     resolver: zodResolver(updateUserDetailSchema),
     defaultValues: user
   })
 
-  const onSubmit = () => {
-    return
+  const onSubmit = async (values: z.infer<typeof updateUserDetailSchema>) => {
+    try {
+      const res = await updateUserDetails(values)
+      if (!res.success) {
+        return toast.error(res.message)
+      }
+
+      toast.success(res.message)
+
+      form.reset()
+      router.push('/admin/users')
+    } catch (error) {
+      toast.error((error as Error).message)
+    }
   }
   return (
     <Form {...form}>
