@@ -1,10 +1,21 @@
+import ProductCarousel from '@/components/shared/product/product-carousel'
 import ProductList from '@/components/shared/product/product-list'
-import { getListedProducts } from '@/lib/actions/product.action'
+import {
+  getFeatureProduct,
+  getListedProducts
+} from '@/lib/actions/product.action'
 
 const Homepage = async () => {
   const latestProducts = await getListedProducts()
-
-  return <ProductList data={latestProducts} title='Newest Arrivals' />
+  const featuredProducts = await getFeatureProduct()
+  return (
+    <>
+      {featuredProducts.length > 0 && (
+        <ProductCarousel data={featuredProducts} />
+      )}
+      <ProductList data={latestProducts} title='Newest Arrivals' />
+    </>
+  )
 }
 
 export default Homepage
