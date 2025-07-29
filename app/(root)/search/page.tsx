@@ -177,14 +177,14 @@ const SearchPage = async (props: {
             <div>{price !== 'all' && `Price: ${price}`}</div>
             <div>{rating !== 'all' && `Rating: ${rating} stars & up`}</div>
             <div>
-              {(q !== 'all' && q !== '') ||
-              (category !== 'all' && category !== '') ||
-              price !== 'all' ||
-              rating !== 'all' ? (
+              {['q', 'category', 'price', 'rating'].some((key) => {
+                const val = { q, category, price, rating }[key]
+                return val && val != 'all' && val != ''
+              }) && (
                 <Button variant={'link'} asChild>
                   <Link href={'/search'}>Clear</Link>
                 </Button>
-              ) : null}
+              )}
             </div>
           </div>
         </div>
