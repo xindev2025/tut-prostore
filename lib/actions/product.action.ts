@@ -48,7 +48,7 @@ export async function getAllProducts({
   category,
   price,
   rating,
-  sort
+  sort = 'rating'
 }: {
   query: string
   limit?: number
@@ -88,9 +88,24 @@ export async function getAllProducts({
     }
   }
 
+  const sortMap: Record<string, Prisma.ProductOrderByWithRelationInput> = {
+    newest: {
+      createdAt: 'desc'
+    },
+    lowest: {
+      price: 'asc'
+    },
+    highest: {
+      price: 'desc'
+    },
+    rating: {
+      rating: 'desc'
+    }
+  }
+
   const data = await prisma.product.findMany({
     where: whereFilters,
-    orderBy: { createdAt: 'desc' },
+    orderBy: sortMap[sort],
     skip: (page - 1) * limit,
     take: limit
   })

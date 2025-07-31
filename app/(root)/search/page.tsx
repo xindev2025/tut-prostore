@@ -81,6 +81,9 @@ const SearchPage = async (props: {
     return `/search?${new URLSearchParams(params).toString()}`
   }
 
+  // const sort orders
+  const sortOrders = ['newest', 'lowest', 'highest', 'rating']
+
   const products = await getAllProducts({
     page: Number(page),
     query: q,
@@ -186,6 +189,18 @@ const SearchPage = async (props: {
                 </Button>
               )}
             </div>
+          </div>
+          <div>
+            Sort by
+            {sortOrders.map((srt) => (
+              <Link
+                href={getFilterUrl({ s: srt })}
+                key={srt}
+                className={`mx-2 ${sort === srt && 'font-bold'}`}
+              >
+                {srt}
+              </Link>
+            ))}
           </div>
         </div>
         <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
