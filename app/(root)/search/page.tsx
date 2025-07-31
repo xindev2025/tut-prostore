@@ -1,7 +1,12 @@
 import ProductCard from '@/components/shared/product/product-card'
 import { Button } from '@/components/ui/button'
 import { getAllCategories, getAllProducts } from '@/lib/actions/product.action'
+import { Metadata } from 'next'
 import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: 'Search Product'
+}
 
 const SearchPage = async (props: {
   searchParams: Promise<{
