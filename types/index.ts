@@ -4,6 +4,7 @@ import {
   insertOrderItemSchema,
   InsertOrderSchema,
   InsertProductSchema,
+  insertReviewSchema,
   PaymentMethodSchema,
   paymentResultSchema,
   ShippingAddressSchema
@@ -35,3 +36,9 @@ export type Order = z.infer<typeof InsertOrderSchema> & {
 }
 
 export type PaymentResult = z.infer<typeof paymentResultSchema>
+
+export type Review = z.infer<typeof insertReviewSchema> & {
+  id: string
+  createdAt: Date
+  user?: { name: string }
+}
