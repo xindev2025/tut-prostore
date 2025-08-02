@@ -96,14 +96,14 @@ const ReviewForm = ({
                 control={form.control}
                 name='rating'
                 render={({ field }) => (
-                  <FormItem className='w-full'>
+                  <FormItem>
                     <FormLabel>Rating</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      value={field.value.toString()}
+                      value={field.value ? field.value.toString() : ''}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className='w-full'>
                           <SelectValue placeholder='Select a rating' />
                         </SelectTrigger>
                       </FormControl>
