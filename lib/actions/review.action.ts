@@ -37,15 +37,14 @@ export async function createUpdateReview(
     const reviewExist = await prisma.review.findFirst({
       where: { productId: review.productId, userId: review.userId }
     })
-
     await prisma.$transaction(async (tx) => {
       if (reviewExist) {
         await tx.review.update({
-          where: { id: reviewExist.productId },
+          where: { id: reviewExist.id },
           data: {
-            title: reviewExist.title,
-            description: reviewExist.description,
-            rating: reviewExist.rating
+            title: review.title,
+            description: review.description,
+            rating: review.rating
           }
         })
       } else {
@@ -53,24 +52,24 @@ export async function createUpdateReview(
         await tx.review.create({
           data: review
         })
-        // get avg rating
-        const avgRating = await tx.review.aggregate({
-          where: { productId: review.productId },
-          _avg: { rating: true }
-        })
-        // get num reviews
-        const numReviews = await tx.review.count({
-          where: { productId: review.productId }
-        })
-        // update product
-        await tx.product.update({
-          where: { id: review.productId },
-          data: {
-            rating: avgRating._avg.rating || 0,
-            numReviews
-          }
-        })
       }
+      // get avg rating
+      const avgRating = await tx.review.aggregate({
+        where: { productId: review.productId },
+        _avg: { rating: true }
+      })
+      // get num reviews
+      const numReviews = await tx.review.count({
+        where: { productId: review.productId }
+      })
+      // update product
+      await tx.product.update({
+        where: { id: review.productId },
+        data: {
+          rating: avgRating._avg.rating || 0,
+          numReviews
+        }
+      })
     })
 
     revalidatePath(`/products/${product.slug}`)
