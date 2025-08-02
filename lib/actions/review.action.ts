@@ -114,7 +114,7 @@ export async function getReviewByUser({ productId }: { productId: string }) {
     throw new Error('User is not authenticated')
   }
 
-  return await prisma.review.findMany({
+  return await prisma.review.findFirst({
     where: { productId, userId: session?.user.id }
   })
 }

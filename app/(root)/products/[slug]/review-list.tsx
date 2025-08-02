@@ -36,8 +36,9 @@ const ReviewList = ({
     loadReviews()
   }, [productId])
 
-  const reload = () => {
-    console.log('review')
+  const reload = async () => {
+    const res = await getReviews({ productId })
+    setReviews([...res.data])
   }
 
   return (
