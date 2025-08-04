@@ -27,15 +27,18 @@ import {
 import { toast } from 'sonner'
 import { useTransition } from 'react'
 import { Button } from '@/components/ui/button'
+import StripePayment from './stripe-payment'
 
 const OrderDetailsTable = ({
   order,
   paypalClientId,
-  isAdmin
+  isAdmin,
+  stripeClientSecret
 }: {
   order: Order
   paypalClientId: string
   isAdmin: boolean
+  stripeClientSecret: string | null
 }) => {
   const {
     paymentMethod,
@@ -215,6 +218,14 @@ const OrderDetailsTable = ({
                 <div>Total</div>
                 <div>{formatCurrency(totalPrice)}</div>
               </div>
+              {/* stripe payment */}
+              {!isPaid && paymentMethod === 'stripe' && stripeClientSecret && (
+                <StripePayment
+                  priceInCents={Number(order.totalPrice) * 100}
+                  orderId={order.id}
+                  clientSecret={stripeClientSecret}
+                />
+              )}
               {/* paypal payment */}
               {!isPaid && paymentMethod === 'paypal' && (
                 <div>
