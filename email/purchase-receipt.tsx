@@ -14,10 +14,14 @@ import {
   Tailwind,
   Text
 } from '@react-email/components'
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+require('dotenv').config()
 
 const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' })
 
-const PurchaseEmailEmail = ({ order }: { order: Order }) => {
+export default function PurchaseEmailReceipt({
+  order
+}: Readonly<{ order: Order }>) {
   return (
     <Html>
       <Preview>View order receipt</Preview>
@@ -95,5 +99,3 @@ const PurchaseEmailEmail = ({ order }: { order: Order }) => {
     </Html>
   )
 }
-
-export default PurchaseEmailEmail

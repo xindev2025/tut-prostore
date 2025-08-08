@@ -7,10 +7,11 @@ import { getUserById } from './user.actions'
 import { InsertOrderSchema } from '../validators'
 import { prisma } from '@/db/prisma'
 import { paypal } from '../paypal'
-import { PaymentResult } from '@/types'
+import { PaymentResult, ShippingAddress } from '@/types'
 import { revalidatePath } from 'next/cache'
 import { PAGE_SIZE } from '../constants'
 import { Prisma } from '../generated/prisma'
+import { sendPurchaseReceipt } from '@/email'
 
 export async function createOrder() {
   try {
@@ -275,6 +276,14 @@ async function updateOrderToPaid({
   if (!updatedOrder) {
     throw new Error('Order not found')
   }
+
+  sendPurchaseReceipt({
+    order: {
+      ...updatedOrder,
+      shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
+      paymentResult: updatedOrder.paymentResult as PaymentResult
+    }
+  })
 }
 
 // get user orders
