@@ -1,3 +1,4 @@
+export const runtime = 'nodejs'
 import Stripe from 'stripe'
 import { getOrderById } from '@/lib/actions/order.action'
 import { notFound, redirect } from 'next/navigation'
