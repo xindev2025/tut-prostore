@@ -14,13 +14,10 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 // import Charts from './charts'
 import { requireAdmin } from '@/lib/auth-guard'
-import dynamic from 'next/dynamic'
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard'
 }
-
-const Charts = dynamic(() => import('./charts'), { ssr: false })
 
 const AdminOverviewPage = async () => {
   // admin authorization
@@ -85,11 +82,11 @@ const AdminOverviewPage = async () => {
             <CardTitle>Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <Charts
+            {/* <Charts
               data={{
                 salesData: summary.salesData
               }}
-            />
+            /> */}
           </CardContent>
         </Card>
         <Card className='col-span-3'>
