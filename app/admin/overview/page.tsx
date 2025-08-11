@@ -12,12 +12,15 @@ import { formatCurrency, formatDateTime, formatNumber } from '@/lib/utils'
 import { BadgeDollarSign, Barcode, CreditCard, Users } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
-import Charts from './charts'
+// import Charts from './charts'
 import { requireAdmin } from '@/lib/auth-guard'
+import dynamic from 'next/dynamic'
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard'
 }
+
+const Charts = dynamic(() => import('./charts'), { ssr: false })
 
 const AdminOverviewPage = async () => {
   // admin authorization
