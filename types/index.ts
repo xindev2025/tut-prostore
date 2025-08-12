@@ -44,3 +44,7 @@ export type Review = z.infer<typeof insertReviewSchema> & {
   createdAt: Date
   user?: { name: string }
 }
+
+// for stripe
+// @stripe/stripe-js
+// @stripe/react-stripe-js
