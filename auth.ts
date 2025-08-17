@@ -1,19 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import NextAuth, { NextAuthConfig } from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from './db/prisma'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { compare } from './lib/encrypt'
-import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-
+import NextAuth from 'next-auth'
+import { authConfig } from './auth.config'
 export const config = {
   pages: {
     signIn: '/sign-in',
     signOut: '/sign-in'
   },
   session: {
-    strategy: 'jwt',
+    strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60 // 30 days
   },
   adapter: PrismaAdapter(prisma),
@@ -55,6 +54,7 @@ export const config = {
     })
   ],
   callbacks: {
+    ...authConfig.callbacks,
     async session({ session, user, trigger, token }: any) {
       // set the user id from the token
       session.user.id = token.sub
@@ -111,49 +111,8 @@ export const config = {
       }
 
       return token
-    },
-    authorized({ request, auth }: any) {
-      // protected paths
-      const protectedPaths = [
-        /\/shipping-address/,
-        /\/payment-method/,
-        /\/place-order/,
-        /\/profile/,
-        /\/user\/(.*)/,
-        /\/order\/(.*)/,
-        /\/admin/
-      ]
-
-      // get pathname
-      const { pathname } = request.nextUrl
-      // check if not authorized and accessing the protected path
-      if (!auth && protectedPaths.some((path) => path.test(pathname)))
-        return false
-
-      // check for session cart cookie
-      if (!request.cookies.get('sessionCartId')) {
-        // generate new session card id cookie
-        const sessionCartId = crypto.randomUUID()
-
-        // clone req headers
-        const newRequestHeaders = new Headers(request.headers)
-
-        // create new response and add the new headers
-        const response = NextResponse.next({
-          request: {
-            headers: newRequestHeaders
-          }
-        })
-
-        // set session cart id in the response cookies
-        response.cookies.set('sessionCartId', sessionCartId)
-
-        return response
-      } else {
-        return true
-      }
     }
   }
-} satisfies NextAuthConfig
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth(config)
